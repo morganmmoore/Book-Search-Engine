@@ -8,7 +8,8 @@ import SearchBooks from './pages/SearchBooks';
 import SavedBooks from './pages/SavedBooks';
 
 const client = new ApolloClient({
-  request: operation => {
+  request: (operation) => {
+    // localStorage.removeItem('token');
     const token = localStorage.getItem('id_token');
     operation.setContext({
       headers: {

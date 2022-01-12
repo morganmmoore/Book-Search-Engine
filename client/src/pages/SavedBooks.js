@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Jumbotron, Container, CardColumns, Card, Button } from 'react-bootstrap';
 
 import { GET_ME } from '../utils/queries';
@@ -30,6 +30,8 @@ const SavedBooks = () => {
       const { data } = await removeBook ({
         variables: { bookId }
       });
+
+      console.log(data);
 
       removeBookId(bookId);
     } catch (err) {

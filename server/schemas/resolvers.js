@@ -1,6 +1,6 @@
 const { AuthenticationError } = require('apollo-server-express');
 const { signToken } = require('../utils/auth');
-const { User } = require('../models');
+const { User, Book } = require('../models');
 
 const resolvers = {
     Query: {
@@ -23,15 +23,15 @@ const resolvers = {
             return { token, user };
         },
         login: async (parent, { email, password }) => {
-            const user = await User.findOne({email});
+            const user = await User.findOne({ email });
 
             if (!user) {
                 throw new AuthenticationError('Incorrect login information. Try again.');
             }
 
-            const correctPassword = await user.isCorrectPassword(password);
+            const correctPw = await user.isCorrectPassword(password);
 
-            if (!correctPassword) {
+            if (!correctPw) {
                 throw new AuthenticationError('Incorrect login information. Try again.');
             }
 
@@ -40,16 +40,26 @@ const resolvers = {
         },
         saveBook: async (parent, { book }, context) => {
             if (context.user) {
-                const updatedInfo = await User.findOneAndUpdate(
+                const updatedUser = await User.findOneAndUpdate(
                     { _id: context.user._id},
                     { $addToSet: { savedBooks: book }},
                     { new: true }
                 );
 
-                return updatedInfo;
+                return updatedUser;
             }
 
             throw new AuthenticationError("Please log in!")
+        },
+        removeBook: async (parent, { bookID }, context) => {
+            if(context.user){
+                const updatedUser = await User.findOneAndUpdate(
+                    { _id: context.user._id },
+                    { $pull: { savedBooks: { bookID: bookID }}},
+                    { new: true }
+                );
+                return updatedUser;
+            }
         }
     }
 };
